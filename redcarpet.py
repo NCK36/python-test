@@ -9,7 +9,8 @@ Created on Mon Oct 22 21:54:44 2018
 import nsepy
 import pandas as pd
 from datetime import date
-import numpy as np
+from bokeh.models import ColumnDataSource
+from bokeh.plotting import figure, show, output_file
 
 nse_infy = nsepy.get_history(symbol='INFY',
                              start=date(2015,1,1),
@@ -93,3 +94,11 @@ nse_infy_price_vol_shock = price_shock_no_volume_shock(nse_infy_price_shock,nse_
 nse_tcs_price_vol_shock = price_shock_no_volume_shock(nse_tcs_price_shock,nse_tcs_volume_shock)
 nifty_it_price_vol_shock = price_shock_no_volume_shock(nifty_it_price_shock,nifty_it_volume_shock)
 
+# data visualization
+## NSE INFY
+source = ColumnDataSource(nse_infy)
+nse_infy_plot = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
+                       title="INFY closing price timeseries")
+nse_infy_plot.line('Date', 'Close', color='blue', source=source)
+output_file("nse_infy_plot.html")
+show(nse_infy_plot)
