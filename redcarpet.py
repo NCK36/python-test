@@ -9,7 +9,8 @@ Created on Mon Oct 22 21:54:44 2018
 import nsepy
 import pandas as pd
 from datetime import date
-from bokeh.models import ColumnDataSource
+import numpy as np
+from bokeh.models import ColumnDataSource, LinearColorMapper
 from bokeh.plotting import figure, show, output_file
 
 nse_infy = nsepy.get_history(symbol='INFY',
@@ -96,9 +97,76 @@ nifty_it_price_vol_shock = price_shock_no_volume_shock(nifty_it_price_shock,nift
 
 # data visualization
 ## NSE INFY
-source = ColumnDataSource(nse_infy)
+source1 = ColumnDataSource(nse_infy)
 nse_infy_plot = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
                        title="INFY closing price timeseries")
-nse_infy_plot.line('Date', 'Close', color='blue', source=source)
+nse_infy_plot.line('Date', 'Close', color='blue', source=source1)
 output_file("nse_infy_plot.html")
 show(nse_infy_plot)
+
+nse_infy_volume_shock_subset = pd.Series(np.where(nse_infy_volume_shock == 1, nse_infy['Close'], np.nan))
+nse_infy_volume_shock_subset = nse_infy_volume_shock_subset.rename('Close').to_frame()
+nse_infy_volume_shock_subset.index = nse_infy.index
+source2 = ColumnDataSource(nse_infy_volume_shock_subset)
+nse_infy_plot.line('Date', 'Close', color='red', source=source2)
+output_file("nse_infy_plot_volume_shock.html")
+show(nse_infy_plot)
+
+nse_infy['Close_diff_52'] = nse_infy[['Close']].sub(nse_infy_52w)
+source3 = ColumnDataSource(nse_infy)
+nse_infy_plot_52diff = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
+                       title="INFY closing price timeseries diff 52W")
+color_mapper = LinearColorMapper(palette='Blues8', low=min(nse_infy.Close_diff_52), high=max(nse_infy.Close_diff_52))
+nse_infy_plot_52diff.scatter('Date', 'Close_diff_52', color={'field': 'Close_diff_52', 'transform': color_mapper}, source=source3)
+output_file("nse_infy_plot_52diff.html")
+show(nse_infy_plot_52diff)
+
+## NSE TCS
+source1 = ColumnDataSource(nse_tcs)
+nse_tcs_plot = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
+                       title="TCS closing price timeseries")
+nse_tcs_plot.line('Date', 'Close', color='blue', source=source1)
+output_file("nse_tcs_plot.html")
+show(nse_tcs_plot)
+
+nse_tcs_volume_shock_subset = pd.Series(np.where(nse_tcs_volume_shock == 1, nse_tcs['Close'], np.nan))
+nse_tcs_volume_shock_subset = nse_tcs_volume_shock_subset.rename('Close').to_frame()
+nse_tcs_volume_shock_subset.index = nse_tcs.index
+source2 = ColumnDataSource(nse_tcs_volume_shock_subset)
+nse_infy_plot.line('Date', 'Close', color='red', source=source2)
+output_file("nse_tcs_plot_volume_shock.html")
+show(nse_tcs_plot)
+
+nse_tcs['Close_diff_52'] = nse_tcs[['Close']].sub(nse_tcs_52w)
+source3 = ColumnDataSource(nse_tcs)
+nse_tcs_plot_52diff = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
+                       title="TCS closing price timeseries diff 52W")
+color_mapper = LinearColorMapper(palette='Blues8', low=min(nse_tcs.Close_diff_52), high=max(nse_tcs.Close_diff_52))
+nse_tcs_plot_52diff.scatter('Date', 'Close_diff_52', color={'field': 'Close_diff_52', 'transform': color_mapper}, source=source3)
+output_file("nse_tcs_plot_52diff.html")
+show(nse_tcs_plot_52diff)
+
+## NIFTY IT INDEX
+source1 = ColumnDataSource(nifty_it_index)
+nifty_it_plot = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
+                       title="NIFTY IT INDEX closing price timeseries")
+nifty_it_plot.line('Date', 'Close', color='blue', source=source1)
+output_file("nifty_it_plot.html")
+show(nifty_it_plot)
+
+nifty_it_volume_shock_subset = pd.Series(np.where(nifty_it_volume_shock == 1, nifty_it_index['Close'], np.nan))
+nifty_it_volume_shock_subset = nifty_it_volume_shock_subset.rename('Close').to_frame()
+nifty_it_volume_shock_subset.index = nifty_it_index.index
+source2 = ColumnDataSource(nifty_it_volume_shock_subset)
+nifty_it_plot.line('Date', 'Close', color='red', source=source2)
+output_file("nifty_it_plot_volume_shock.html")
+show(nifty_it_plot)
+
+nifty_it_index['Close_diff_52'] = nifty_it_index[['Close']].sub(nifty_it_index_52w)
+source3 = ColumnDataSource(nifty_it_index)
+nifty_it_plot_52diff = figure(x_axis_type="datetime", plot_width=800, plot_height=350,
+                       title="NIFTY IT INDEX closing price timeseries diff 52W")
+color_mapper = LinearColorMapper(palette='Blues8', low=min(nse_tcs.Close_diff_52), high=max(nifty_it_index.Close_diff_52))
+nifty_it_plot_52diff.scatter('Date', 'Close_diff_52', color={'field': 'Close_diff_52', 'transform': color_mapper}, source=source3)
+output_file("nifty_it_plot_52diff.html")
+show(nifty_it_plot_52diff)
